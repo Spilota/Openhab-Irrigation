@@ -1,0 +1,242 @@
+// Groups
+Group	weather	"Weather"
+Group	stationName	"Station Name"	(weather)
+
+Group	currentConditions "Current Conditions"	(weather)
+Group	forecast_1day	"1 Day Forecast"	(weather)
+Group	forecast_2day	"2 Day Forecast"	(weather)
+Group	forecast_3day	"3 Day Forecast"	(weather)
+
+Group	atmosphere "Atmosphere Conditions"	(currentConditions)
+Group	conditions "Conditions"	(currentConditions)
+Group	precipitation "Precipitation"	(currentConditions)
+Group	temperature "Temperature"	(currentConditions)
+Group	wind	"Wind"	(currentConditions)
+
+Group	atmosphere_1day "Atmosphere Conditions"	(forecast_1day)
+Group	conditions_1day "Conditions"	(forecast_1day)
+Group	precipitation_1day "Precipitation"	(forecast_1day)
+Group	temperature_1day "Temperature"	(forecast_1day)
+Group	wind_1day	"Wind"	(forecast_1day)
+
+Group	atmosphere_2day "Atmosphere Conditions"	(forecast_2day)
+Group	conditions_2day "Conditions"	(forecast_2day)
+Group	precipitation_2day "Precipitation"	(forecast_2day)
+Group	temperature_2day "Temperature"	(forecast_2day)
+Group	wind_2day	"Wind"	(forecast_2day)
+
+Group	atmosphere_3day "Atmosphere Conditions"	(forecast_3day)
+Group	conditions_3day "Conditions"	(forecast_3day)
+Group	precipitation_3day "Precipitation"	(forecast_3day)
+Group	temperature_3day "Temperature"	(forecast_3day)
+Group	wind_3day	"Wind"	(forecast_3day)
+
+//Current Conditions
+// atmosphere
+Number   Humidity         "Humidity [%d %%]"      (atmosphere) {weather="locationId=home, forecast=0, type=atmosphere, property=humidity"}
+Number   Visibility_Mph   "Visibility [%.2f mi]"  (atmosphere) {weather="locationId=home, type=atmosphere, property=visibility, unit=mph"}
+Number   Pressure         "Pressure [%.2f mb]"    (atmosphere) {weather="locationId=home, type=atmosphere, property=pressure"}
+Number   Pressure_Inches  "Pressure [%.2f in]"    (atmosphere) {weather="locationId=home, type=atmosphere, property=pressure, unit=inches"}
+String   Pressure_Trend   "Pressuretrend [%s]"    (atmosphere) {weather="locationId=home, type=atmosphere, property=pressureTrend"}
+Number   Ozone            "Ozone [%d ppm]"        (atmosphere) {weather="locationId=home, type=atmosphere, property=ozone"}
+Number   UV_Index         "UV Index"              (atmosphere) {weather="locationId=home, type=atmosphere, property=uvIndex, scale=0"}
+
+// condition
+Number   Clouds   "Clouds [%.0f %%]"   (conditions) {weather="locationId=home, type=clouds, property=percent"}
+String   Condition        "Condition [%s]"      (conditions) {weather="locationId=home, type=condition, property=text"}
+String   Condition_ID     "Condition id [%s]"   (conditions) {weather="locationId=home, type=condition, property=id"}
+DateTime ObservationTime  "Observation time [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"   (conditions) {weather="locationId=home, type=condition, property=observationTime"}
+DateTime LastUpdate       "Last update [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"        (conditions) {weather="locationId=home, type=condition, property=lastUpdate"}
+String   CommonId         "Common id [%s]"      (conditions) {weather="locationId=home, type=condition, property=commonId"}
+
+// precipitation
+Number   Rain_Inches   "Rain [%.2f in/h]"   (precipitation) {weather="locationId=home, type=precipitation, property=rain, unit=inches"}
+//Number   Snow          "Snow [%.2f mm/h]"   (weather) {weather="locationId=home, type=precipitation, property=snow"}
+//Number   Snow_Inches   "Snow [%.2f in/h]"   (weather) {weather="locationId=home, type=precipitation, property=snow, unit=inches"}
+Number   Precip_Probability   "Precip probability [%d %%]"   (precipitation) {weather="locationId=home, type=precipitation, property=probability"}
+Number   Precip_Total         "Precip total [%d mm]"   (precipitation) {weather="locationId=home, type=precipitation, property=total"}
+Number   Precip_Total_Inches  "Precip total [%d in]"   (precipitation) {weather="locationId=home, type=precipitation, property=total, unit=inches"}
+
+// temperature
+Number   Temperature_F    "Temperature [%.2f °F]"       (temperature) {weather="locationId=home, type=temperature, property=current, unit=fahrenheit"}
+Number   Temp_Feel_F      "Temperature feel [%.2f °F]"  (temperature) {weather="locationId=home, type=temperature, property=feel, unit=fahrenheit"}
+Number   Temp_Dewpoint_F  "Dewpoint [%.2f °F]"          (temperature) {weather="locationId=home, type=temperature, property=dewpoint, unit=fahrenheit"}
+// min and max values only available in forecasts
+//Number   Temp_Min         "Temperature min [%.2f °C]"   (weather) {weather="locationId=home, type=temperature, property=min"}
+//Number   Temp_Min_F       "Temperature min [%.2f °F]"   (temperature) {weather="locationId=home, type=temperature, property=min, unit=fahrenheit"}
+//Number   Temp_Max         "Temperature max [%.2f °C]"   (weather) {weather="locationId=home, type=temperature, property=max"}
+//Number   Temp_Max_F       "Temperature max [%.2f °F]"   (temperature) {weather="locationId=home, type=temperature, property=max, unit=fahrenheit"}
+//String   Temp_MinMax      "Min/Max [%s °C]"             (weather) {weather="locationId=home, type=temperature, property=minMax"}
+//String   Temp_MinMax_F    "Min/Max [%s °F]"             (temperature) {weather="locationId=home, type=temperature, property=minMax, unit=fahrenheit"}
+
+// wind
+//Number   Wind_Speed           "Windspeed [%.2f km/h]"    (weather) {weather="locationId=home, type=wind, property=speed"}
+//Number   Wind_Speed_Beaufort  "Windspeed Beaufort [%d]"  (weather) {weather="locationId=home, type=wind, property=speed, unit=beaufort"}
+Number   Wind_Speed_Knots     "Windspeed [%.2f kn]"      (wind) {weather="locationId=home, type=wind, property=speed, unit=knots"}
+//Number   Wind_Speed_Mps       "Windspeed [%.2f mps]"     (weather) {weather="locationId=home, type=wind, property=speed, unit=mps"}
+Number   Wind_Speed_Mph       "Windspeed [%.2f mph]"     (wind) {weather="locationId=home, type=wind, property=speed, unit=mph"}
+String   Wind_Direction       "Wind direction [%s]"      (wind) {weather="locationId=home, type=wind, property=direction"}
+Number   Wind_Degree          "Wind degree [%.0f °]"     (wind) {weather="locationId=home, type=wind, property=degree"}
+//Number   Wind_Gust            "Wind gust [%.2f km/h]"    (weather) {weather="locationId=home, type=wind, property=gust"}
+//Number   Wind_Gust_Beaufort   "Wind gust Beaufort [%d]"  (weather) {weather="locationId=home, type=wind, property=gust, unit=beaufort"}
+//Number   Wind_Gust_Knots      "Wind gust [%.2f kn]"      (weather) {weather="locationId=home, type=wind, property=gust, unit=knots"}
+//Number   Wind_Gust_Mps        "Wind gust [%.2f mps]"     (weather) {weather="locationId=home, type=wind, property=gust, unit=mps"}
+Number   Wind_Gust_Mph        "Wind gust [%.2f mph]"     (wind) {weather="locationId=home, type=wind, property=gust, unit=mph"}
+//Number   Wind_Chill           "Wind chill [%.2f °C]"     (weather) {weather="locationId=home, type=wind, property=chill"}
+Number   Wind_Chill_F         "Wind chill [%.2f °F]"     (wind) {weather="locationId=home, type=wind, property=chill, unit=fahrenheit"}
+
+// weather station (only Wunderground and Hamweather), needs version 1.7 or greater of the binding
+String   Station_Name         "Station Name [%s]"        (stationName) {weather="locationId=home, type=station, property=name"}
+String   Station_Id           "Station Id [%s]"          (stationName) {weather="locationId=home, type=station, property=id"}
+Number   Station_Latitude     "Station Latitude [%.6f]"  (stationName) {weather="locationId=home, type=station, property=latitude, scale=6"}
+Number   Station_Longitude    "Station Longitude [%.6f]" (stationName) {weather="locationId=home, type=station, property=longitude, scale=6"}
+//************************************************************************************************************************************************************** 
+
+//Forecast - 1 day
+// atmosphere
+Number   Humidity_1day         "Humidity [%d %%]"      (atmosphere_1day) {weather="locationId=home, forecast=1,  type=atmosphere, property=humidity"}
+Number   Visibility_Mph_1day   "Visibility [%.2f mi]"  (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=visibility, unit=mph"}
+Number   Pressure_1day         "Pressure [%.2f mb]"    (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=pressure"}
+Number   Pressure_Inches_1day  "Pressure [%.2f in]"    (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=pressure, unit=inches"}
+String   Pressure_Trend_1day   "Pressuretrend [%s]"    (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=pressureTrend"}
+Number   Ozone_1day            "Ozone [%d ppm]"        (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=ozone"}
+Number   UV_Index_1day         "UV Index"              (atmosphere_1day) {weather="locationId=home, forecast=1, type=atmosphere, property=uvIndex, scale=0"}
+
+// condition
+Number   Clouds_1day   "Clouds [%.0f %%]"   (conditions_1day) {weather="locationId=home, forecast=1, type=clouds, property=percent"}
+String   Condition_1day        "Condition [%s]"      (conditions_1day) {weather="locationId=home, forecast=1, type=condition, property=text"}
+String   Condition_ID_1day     "Condition id [%s]"   (conditions_1day) {weather="locationId=home, forecast=1, type=condition, property=id"}
+DateTime ObservationTime_1day  "Observation time [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"   (conditions_1day) {weather="locationId=home, forecast=1, type=condition, property=observationTime"}
+DateTime LastUpdate_1day       "Last update [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"        (conditions_1day) {weather="locationId=home, forecast=1, type=condition, property=lastUpdate"}
+String   CommonId_1day         "Common id [%s]"      (conditions_1day) {weather="locationId=home, forecast=1, type=condition, property=commonId"}
+
+// precipitation
+Number   Rain_Inches_1day   "Rain [%.2f in/h]"   (precipitation_1day) {weather="locationId=home, forecast=1, type=precipitation, property=rain, unit=inches"}
+//Number   Snow          "Snow [%.2f mm/h]"   (weather) {weather="locationId=home, forecast=1, type=precipitation, property=snow"}
+//Number   Snow_Inches   "Snow [%.2f in/h]"   (weather) {weather="locationId=home, forecast=1, type=precipitation, property=snow, unit=inches"}
+Number   Precip_Probability_1day   "Precip probability [%d %%]"   (precipitation_1day) {weather="locationId=home, forecast=1, type=precipitation, property=probability"}
+Number   Precip_Total_1day         "Precip total [%d mm]"   (precipitation_1day) {weather="locationId=home, forecast=1, type=precipitation, property=total"}
+Number   Precip_Total_Inches_1day  "Precip total [%d in]"   (precipitation_1day) {weather="locationId=home, forecast=1, type=precipitation, property=total, unit=inches"}
+
+// temperature
+//Number   Temperature_F_1day    "Temperature [%.2f °F]"       (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=current, unit=fahrenheit"}
+//Number   Temp_Feel_F_1day      "Temperature feel [%.2f °F]"  (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=feel, unit=fahrenheit"}
+//Number   Temp_Dewpoint_F_1day  "Dewpoint [%.2f °F]"          (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=dewpoint, unit=fahrenheit"}
+// min and max values only available in forecasts
+//Number   Temp_Min         "Temperature min [%.2f °C]"   (weather) {weather="locationId=home, forecast=1, type=temperature, property=min"}
+Number   Temp_Min_F_1day       "Temperature min [%.2f °F]"   (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=min, unit=fahrenheit"}
+//Number   Temp_Max         "Temperature max [%.2f °C]"   (weather) {weather="locationId=home, forecast=1, type=temperature, property=max"}
+Number   Temp_Max_F_1day       "Temperature max [%.2f °F]"   (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=max, unit=fahrenheit"}
+//String   Temp_MinMax      "Min/Max [%s °C]"             (weather) {weather="locationId=home, forecast=1, type=temperature, property=minMax"}
+//String   Temp_MinMax_F_1day    "Min/Max [%s °F]"             (temperature_1day) {weather="locationId=home, forecast=1, type=temperature, property=minMax, unit=fahrenheit"}
+
+// wind
+Number   Wind_Speed_Knots_1day     "Windspeed [%.2f kn]"      (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=speed, unit=knots"}
+//Number   Wind_Speed_Mps       "Windspeed [%.2f mps]"     (weather) {weather="locationId=home, forecast=1, type=wind, property=speed, unit=mps"}
+Number   Wind_Speed_Mph_1day       "Windspeed [%.2f mph]"     (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=speed, unit=mph"}
+String   Wind_Direction_1day       "Wind direction [%s]"      (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=direction"}
+Number   Wind_Degree_1day          "Wind degree [%.0f °]"     (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=degree"}
+Number   Wind_Gust_Mph_1day        "Wind gust [%.2f mph]"     (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=gust, unit=mph"}
+//Number   Wind_Chill           "Wind chill [%.2f °C]"     (weather) {weather="locationId=home, forecast=1, type=wind, property=chill"}
+Number   Wind_Chill_F_1day         "Wind chill [%.2f °F]"     (wind_1day) {weather="locationId=home, forecast=1, type=wind, property=chill, unit=fahrenheit"}
+
+
+//************************************************************************************************************************************************************** 
+
+//Forecast - 2 day
+// atmosphere
+Number   Humidity_2day         "Humidity [%d %%]"      (atmosphere_2day) {weather="locationId=home, forecast=2,  type=atmosphere, property=humidity"}
+Number   Visibility_Mph_2day   "Visibility [%.2f mi]"  (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=visibility, unit=mph"}
+Number   Pressure_2day         "Pressure [%.2f mb]"    (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=pressure"}
+Number   Pressure_Inches_2day  "Pressure [%.2f in]"    (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=pressure, unit=inches"}
+String   Pressure_Trend_2day   "Pressuretrend [%s]"    (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=pressureTrend"}
+Number   Ozone_2day            "Ozone [%d ppm]"        (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=ozone"}
+Number   UV_Index_2day         "UV Index"              (atmosphere_2day) {weather="locationId=home, forecast=2, type=atmosphere, property=uvIndex, scale=0"}
+
+// condition
+Number   Clouds_2day   "Clouds [%.0f %%]"   (conditions_2day) {weather="locationId=home, forecast=2, type=clouds, property=percent"}
+String   Condition_2day        "Condition [%s]"      (conditions_2day) {weather="locationId=home, forecast=2, type=condition, property=text"}
+String   Condition_ID_2day     "Condition id [%s]"   (conditions_2day) {weather="locationId=home, forecast=2, type=condition, property=id"}
+DateTime ObservationTime_2day  "Observation time [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"   (conditions_2day) {weather="locationId=home, forecast=2, type=condition, property=observationTime"}
+DateTime LastUpdate_2day       "Last update [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"        (conditions_2day) {weather="locationId=home, forecast=2, type=condition, property=lastUpdate"}
+String   CommonId_2day         "Common id [%s]"      (conditions_2day) {weather="locationId=home, forecast=2, type=condition, property=commonId"}
+
+// precipitation
+Number   Rain_Inches_2day   "Rain [%.2f in/h]"   (precipitation_2day) {weather="locationId=home, forecast=2, type=precipitation, property=rain, unit=inches"}
+//Number   Snow          "Snow [%.2f mm/h]"   (weather) {weather="locationId=home, forecast=2, type=precipitation, property=snow"}
+//Number   Snow_Inches   "Snow [%.2f in/h]"   (weather) {weather="locationId=home, forecast=2, type=precipitation, property=snow, unit=inches"}
+Number   Precip_Probability_2day   "Precip probability [%d %%]"   (precipitation_2day) {weather="locationId=home, forecast=2, type=precipitation, property=probability"}
+Number   Precip_Total_2day         "Precip total [%d mm]"   (precipitation_2day) {weather="locationId=home, forecast=2, type=precipitation, property=total"}
+Number   Precip_Total_Inches_2day  "Precip total [%d in]"   (precipitation_2day) {weather="locationId=home, forecast=2, type=precipitation, property=total, unit=inches"}
+
+// temperature
+//Number   Temperature_F_2day    "Temperature [%.2f °F]"       (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=current, unit=fahrenheit"}
+//Number   Temp_Feel_F_2day      "Temperature feel [%.2f °F]"  (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=feel, unit=fahrenheit"}
+//Number   Temp_Dewpoint_F_2day  "Dewpoint [%.2f °F]"          (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=dewpoint, unit=fahrenheit"}
+// min and max values only available in forecasts
+//Number   Temp_Min         "Temperature min [%.2f °C]"   (weather) {weather="locationId=home, forecast=2, type=temperature, property=min"}
+Number   Temp_Min_F_2day       "Temperature min [%.2f °F]"   (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=min, unit=fahrenheit"}
+//Number   Temp_Max         "Temperature max [%.2f °C]"   (weather) {weather="locationId=home, forecast=2, type=temperature, property=max"}
+Number   Temp_Max_F_2day       "Temperature max [%.2f °F]"   (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=max, unit=fahrenheit"}
+//String   Temp_MinMax      "Min/Max [%s °C]"             (weather) {weather="locationId=home, forecast=2, type=temperature, property=minMax"}
+//String   Temp_MinMax_F_2day    "Min/Max [%s °F]"             (temperature_2day) {weather="locationId=home, forecast=2, type=temperature, property=minMax, unit=fahrenheit"}
+
+// wind
+Number   Wind_Speed_Knots_2day     "Windspeed [%.2f kn]"      (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=speed, unit=knots"}
+//Number   Wind_Speed_Mps       "Windspeed [%.2f mps]"     (weather) {weather="locationId=home, forecast=2, type=wind, property=speed, unit=mps"}
+Number   Wind_Speed_Mph_2day       "Windspeed [%.2f mph]"     (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=speed, unit=mph"}
+String   Wind_Direction_2day       "Wind direction [%s]"      (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=direction"}
+Number   Wind_Degree_2day          "Wind degree [%.0f °]"     (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=degree"}
+Number   Wind_Gust_Mph_2day        "Wind gust [%.2f mph]"     (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=gust, unit=mph"}
+//Number   Wind_Chill           "Wind chill [%.2f °C]"     (weather) {weather="locationId=home, forecast=2, type=wind, property=chill"}
+Number   Wind_Chill_F_2day         "Wind chill [%.2f °F]"     (wind_2day) {weather="locationId=home, forecast=2, type=wind, property=chill, unit=fahrenheit"}
+
+//************************************************************************************************************************************************************** 
+
+//Forecast - 3 day
+// atmosphere
+Number   Humidity_3day         "Humidity [%d %%]"      (atmosphere_3day) {weather="locationId=home, forecast=3,  type=atmosphere, property=humidity"}
+Number   Visibility_Mph_3day   "Visibility [%.2f mi]"  (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=visibility, unit=mph"}
+Number   Pressure_3day         "Pressure [%.2f mb]"    (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=pressure"}
+Number   Pressure_Inches_3day  "Pressure [%.2f in]"    (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=pressure, unit=inches"}
+String   Pressure_Trend_3day   "Pressuretrend [%s]"    (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=pressureTrend"}
+Number   Ozone_3day            "Ozone [%d ppm]"        (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=ozone"}
+Number   UV_Index_3day         "UV Index"              (atmosphere_3day) {weather="locationId=home, forecast=3, type=atmosphere, property=uvIndex, scale=0"}
+
+// condition
+Number   Clouds_3day   "Clouds [%.0f %%]"   (conditions_3day) {weather="locationId=home, forecast=3, type=clouds, property=percent"}
+String   Condition_3day        "Condition [%s]"      (conditions_3day) {weather="locationId=home, forecast=3, type=condition, property=text"}
+String   Condition_ID_3day     "Condition id [%s]"   (conditions_3day) {weather="locationId=home, forecast=3, type=condition, property=id"}
+DateTime ObservationTime_3day  "Observation time [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"   (conditions_3day) {weather="locationId=home, forecast=3, type=condition, property=observationTime"}
+DateTime LastUpdate_3day       "Last update [%1$td.%1$tm.%1$tY %1$tH:%1$tM]"        (conditions_3day) {weather="locationId=home, forecast=3, type=condition, property=lastUpdate"}
+String   CommonId_3day         "Common id [%s]"      (conditions_3day) {weather="locationId=home, forecast=3, type=condition, property=commonId"}
+
+// precipitation
+Number   Rain_Inches_3day   "Rain [%.2f in/h]"   (precipitation_3day) {weather="locationId=home, forecast=3, type=precipitation, property=rain, unit=inches"}
+//Number   Snow          "Snow [%.2f mm/h]"   (weather) {weather="locationId=home, forecast=3, type=precipitation, property=snow"}
+//Number   Snow_Inches   "Snow [%.2f in/h]"   (weather) {weather="locationId=home, forecast=3, type=precipitation, property=snow, unit=inches"}
+Number   Precip_Probability_3day   "Precip probability [%d %%]"   (precipitation_3day) {weather="locationId=home, forecast=3, type=precipitation, property=probability"}
+Number   Precip_Total_3day         "Precip total [%d mm]"   (precipitation_3day) {weather="locationId=home, forecast=3, type=precipitation, property=total"}
+Number   Precip_Total_Inches_3day  "Precip total [%d in]"   (precipitation_3day) {weather="locationId=home, forecast=3, type=precipitation, property=total, unit=inches"}
+
+// temperature
+//Number   Temperature_F_3day    "Temperature [%.2f °F]"       (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=current, unit=fahrenheit"}
+//Number   Temp_Feel_F_3day      "Temperature feel [%.2f °F]"  (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=feel, unit=fahrenheit"}
+//Number   Temp_Dewpoint_F_3day  "Dewpoint [%.2f °F]"          (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=dewpoint, unit=fahrenheit"}
+// min and max values only available in forecasts
+//Number   Temp_Min         "Temperature min [%.2f °C]"   (weather) {weather="locationId=home, forecast=3, type=temperature, property=min"}
+Number   Temp_Min_F_3day       "Temperature min [%.2f °F]"   (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=min, unit=fahrenheit"}
+//Number   Temp_Max         "Temperature max [%.2f °C]"   (weather) {weather="locationId=home, forecast=3, type=temperature, property=max"}
+Number   Temp_Max_F_3day       "Temperature max [%.2f °F]"   (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=max, unit=fahrenheit"}
+//String   Temp_MinMax      "Min/Max [%s °C]"             (weather) {weather="locationId=home, forecast=3, type=temperature, property=minMax"}
+//String   Temp_MinMax_F_3day    "Min/Max [%s °F]"             (temperature_3day) {weather="locationId=home, forecast=3, type=temperature, property=minMax, unit=fahrenheit"}
+
+// wind
+Number   Wind_Speed_Knots_3day     "Windspeed [%.2f kn]"      (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=speed, unit=knots"}
+//Number   Wind_Speed_Mps       "Windspeed [%.2f mps]"     (weather) {weather="locationId=home, forecast=3, type=wind, property=speed, unit=mps"}
+Number   Wind_Speed_Mph_3day       "Windspeed [%.2f mph]"     (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=speed, unit=mph"}
+String   Wind_Direction_3day       "Wind direction [%s]"      (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=direction"}
+Number   Wind_Degree_3day          "Wind degree [%.0f °]"     (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=degree"}
+Number   Wind_Gust_Mph_3day        "Wind gust [%.2f mph]"     (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=gust, unit=mph"}
+//Number   Wind_Chill           "Wind chill [%.2f °C]"     (weather) {weather="locationId=home, forecast=3, type=wind, property=chill"}
+Number   Wind_Chill_F_3day         "Wind chill [%.2f °F]"     (wind_3day) {weather="locationId=home, forecast=3, type=wind, property=chill, unit=fahrenheit"}

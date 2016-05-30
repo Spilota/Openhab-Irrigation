@@ -1,0 +1,217 @@
+sitemap irrigation label="Dreyfous Irrigation"
+{
+	Frame label="Current Runtime"{
+		Text item=FrontyardRunTime
+		Text item=BackyardRunTime
+	}
+	Frame label="Front Yard Zones" {
+		Switch item=FrontyardZone1 label="Front Lawn Zone 1" mappings=[ON="Open", OFF="Closed"]		
+		Switch item=FrontyardZone2 label="Front Lawn Zone 2" mappings=[ON="Open", OFF="Closed"]		
+		Switch item=FrontyardZone3 label="Front Garden Drip" mappings=[ON="Open", OFF="Closed"]		
+		Switch item=FrontyardZone4 label="Planter Drip" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=FrontyardZone5 label="Zone 5" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=FrontyardZone6 label="Zone 6" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=FrontyardZone7 label="Zone 7" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=FrontyardZone8 label="Zone 8" mappings=[ON="Open", OFF="Closed"]		
+	}	
+	Frame label="Back Yard Zones" {
+		Switch item=BackyardZone1 label="Garden Spray" mappings=[ON="Open", OFF="Closed"]		
+		Switch item=BackyardZone2 label="Garden Drip Zone 1" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone3 label="Zone 3" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone4 label="Zone 4" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone5 label="Zone 5" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone6 label="Zone 6" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone7 label="Zone 7" mappings=[ON="Open", OFF="Closed"]		
+//		Switch item=BackyardZone8 label="Zone 8" mappings=[ON="Open", OFF="Closed"]		
+	}	
+	Frame {
+		Group label="Program Run Time Settings" icon="settings" {
+			Frame label="Irrigation Program Settings"{
+			Group label="Lawn Settings" icon="settings" {
+				Frame label="Master Settings" {
+					Switch item=ProgramA_Master label="Lawn Master Control"
+					Switch item=ProgramA_Master_Weather label="Lawn Weather Override"
+					Setpoint item=ProgramA_ScaleFactor minValue=0 maxValue=100 step=5			
+					Text item=ProgramA_StartTime label="Start Time [%s]"
+					Setpoint item=ProgramA_StartTime_Hours minValue=0 maxValue=24 step=1
+					Setpoint item=ProgramA_StartTime_Minutes minValue=0 maxValue=60 step=1					
+				}			
+				Frame label="Front Zone Durations" {
+					Setpoint item=FrontyardZone1_Duration_A minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone2_Duration_A minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone3_Duration_A minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone4_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone5_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone6_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone7_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone8_Duration_A minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Back Zone Durations" {
+					Setpoint item=BackyardZone1_Duration_A minValue=0 maxValue=30 step=5				
+					Setpoint item=BackyardZone2_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone3_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone4_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone5_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone6_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone7_Duration_A minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone8_Duration_A minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Days to Run"{
+					Switch item=Monday_ProgramA
+					Switch item=Tuesday_ProgramA
+					Switch item=Wednesday_ProgramA
+					Switch item=Thursday_ProgramA
+					Switch item=Friday_ProgramA
+					Switch item=Saturday_ProgramA
+					Switch item=Sunday_ProgramA
+				}
+			}
+			Group label="Garden Drip Settings" icon="settings" {
+				Frame label="Garden Drip Master Settings" {
+					Switch item=ProgramB_Master label="Garden Drip Master"
+					Switch item=ProgramB_Master_Weather label="Garden Drip Weather Override"
+					Setpoint item=ProgramB_ScaleFactor minValue=0 maxValue=100 step=5				
+					Text item=ProgramB_StartTime label="Start Time [%s]"
+					Setpoint item=ProgramB_StartTime_Hours minValue=0 maxValue=24 step=1
+					Setpoint item=ProgramB_StartTime_Minutes minValue=0 maxValue=60 step=5					
+				}			
+				Frame label="Front Zone Durations" {
+					Setpoint item=FrontyardZone1_Duration_B minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone2_Duration_B minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone3_Duration_B minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone4_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone5_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone6_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone7_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone8_Duration_B minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Back Zone Durations" {
+					Setpoint item=BackyardZone1_Duration_B minValue=0 maxValue=30 step=5				
+					Setpoint item=BackyardZone2_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone3_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone4_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone5_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone6_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone7_Duration_B minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone8_Duration_B minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Days to Run"{
+					Switch item=Monday_ProgramB
+					Switch item=Tuesday_ProgramB
+					Switch item=Wednesday_ProgramB
+					Switch item=Thursday_ProgramB
+					Switch item=Friday_ProgramB
+					Switch item=Saturday_ProgramB
+					Switch item=Sunday_ProgramB
+				}
+			}
+			Group label="Planter Settings" icon="settings" {
+				Frame label="Planter Master Settings" {
+					Switch item=ProgramC_Master label="Planter Master"
+					Switch item=ProgramC_Master_Weather label="Planter Override"
+					Setpoint item=ProgramC_ScaleFactor minValue=0 maxValue=100 step=5			
+					Text item=ProgramC_StartTime label="Start Time [%s]"
+					Setpoint item=ProgramC_StartTime_Hours minValue=0 maxValue=24 step=1
+					Setpoint item=ProgramC_StartTime_Minutes minValue=0 maxValue=60 step=1					
+				}			
+				Frame label="Front Zone Durations" {
+					Setpoint item=FrontyardZone1_Duration_C minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone2_Duration_C minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone3_Duration_C minValue=0 maxValue=30 step=5				
+					Setpoint item=FrontyardZone4_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone5_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone6_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone7_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone8_Duration_C minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Back Zone Durations" {
+					Setpoint item=BackyardZone1_Duration_C minValue=0 maxValue=30 step=5				
+					Setpoint item=BackyardZone2_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone3_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone4_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone5_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone6_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone7_Duration_C minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone8_Duration_C minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Days to Run"{
+					Switch item=Monday_ProgramC
+					Switch item=Tuesday_ProgramC
+					Switch item=Wednesday_ProgramC
+					Switch item=Thursday_ProgramC
+					Switch item=Friday_ProgramC
+					Switch item=Saturday_ProgramC
+					Switch item=Sunday_ProgramC
+				}
+			}
+			Group label="Garden Spray Settings" icon="settings" {
+				Frame label="Garden Spray Master Settings" {
+					Switch item=ProgramD_Master label="Garden Spray Master"
+					Switch item=ProgramD_Master_Weather label="Garden Spray Weather Override"
+					Setpoint item=ProgramD_ScaleFactor minValue=0 maxValue=100 step=5			
+					Text item=ProgramD_StartTime label="Start Time [%s]"
+					Setpoint item=ProgramD_StartTime_Hours minValue=0 maxValue=24 step=1
+					Setpoint item=ProgramD_StartTime_Minutes minValue=0 maxValue=60 step=1					
+				}			
+//				Frame label="Front Zone Durations" {
+//					Setpoint item=FrontyardZone1_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone2_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone3_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone4_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone5_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone6_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone7_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=FrontyardZone8_Duration_D minValue=0 maxValue=30 step=5				
+//				}
+				Frame label="Zone Durations" {
+					Setpoint item=BackyardZone1_Duration_D minValue=0 maxValue=30 step=5				
+					Setpoint item=BackyardZone2_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone3_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone4_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone5_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone6_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone7_Duration_D minValue=0 maxValue=30 step=5				
+//					Setpoint item=BackyardZone8_Duration_D minValue=0 maxValue=30 step=5				
+				}
+				Frame label="Days to Run"{
+					Switch item=Monday_ProgramD
+					Switch item=Tuesday_ProgramD
+					Switch item=Wednesday_ProgramD
+					Switch item=Thursday_ProgramD
+					Switch item=Friday_ProgramD
+					Switch item=Saturday_ProgramD
+					Switch item=Sunday_ProgramD
+				}
+			}
+			}
+		}			
+		Group label="Controller Status " icon="settings" {
+			Frame label="Frontyard IP Configuration" {
+				Text item=FrontyardIPaddress
+				Text item=FrontyardMACaddress
+				Text item=FrontyardRSSI
+			}
+			Frame label="Frontyard MQTT Status" {
+				Text item=FrontyardMQTTname label="Controller MQTT Client Name: [%S]" icon="network"					
+				Text item=FrontyardBrokerIP label="Connected to broker on IP: [%S]" icon="network"					
+			}
+			Frame label="Frontyard Controller Settings" {
+				Setpoint item=FrontyardStatusPeriod icon="settings" minValue=1 maxValue=30 step=1					
+				Setpoint item=FrontyardMaxOnTime minValue=1 maxValue=30 step=5					
+			}
+			Frame label="Backyard IP Configuration" {
+				Text item=BackyardIPaddress	
+				Text item=BackyardMACaddress
+				Text item=BackyardRSSI
+			}
+			Frame label="Backyard MQTT Status" {
+				Text item=BackyardMQTTname label="Controller MQTT Client Name: [%S]" icon="network"
+				Text item=BackyardBrokerIP label="Connected to broker on IP: [%S]" icon="network"
+			}
+			Frame label="Backyard Controller Settings" {
+				Setpoint item=BackyardStatusPeriod icon="settings" minValue=1 maxValue=30 step=1
+				Setpoint item=BackyardMaxOnTime minValue=1 maxValue=30 step=1
+			}
+		}
+	}
+}

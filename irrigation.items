@@ -1,0 +1,73 @@
+/*Irrigation Groups */
+Group	Irrigation	"Irrigation"	<water>	(MQTT)
+Group	ConnectedIrrigationZones "Connected Irrigation Zones" (Irrigation)	
+Group	IrrigationFront	"Frontyard Irrigation" <water>	(Irrigation)
+Group	IrrigationBack	"Backyard Irrigation" <water>	(Irrigation)
+Group	IrrigationZonesBack	"Backyard Irrigation Zones"	<water>	(Irrigation,IrrigationBack)	
+Group	IrrigationZonesFront	"Frontyard Irrigation Zones"	<water>	(Irrigation,IrrigationFront)	
+	
+/*Feedback Only Groups */
+Group	IrrigationStatusBack	"Backyard Irrigation Zone Status"	(IrrigationBack)
+Group	IrrigationStatusFront	"Frontyard Irrigation Zone Status"	(IrrigationFront)
+Group	ConnectedIrrigationZoneStatus	"Active Irrigation Zone Status"	(Irrigation)
+
+/* Controller Settings*/
+Group	ControllerSettings	"Controller Settings"	(Irrigation)
+Group	ControllerSettingsFront	"Frontyard Controller Settings"	(ControllerSettings)
+Group	ControllerSettingsBack	"Backyard Controller Settings"	(ControllerSettings)
+
+/*Irrigation Zones - Front Yard*/	
+Switch	FrontyardZone1	"Front Zone 1"	<water>	(IrrigationZonesFront,ConnectedIrrigationZones)	{ mqtt="<[broker:myHome/sprinkler/frontyard/1/status:state:default], >[broker:myHome/sprinkler/frontyard/1/target:command:ON:ON],>[broker:myHome/sprinkler/frontyard/1/target:command:OFF:OFF]", autoUpdate="false" }
+Switch	FrontyardZone2	"Front Zone 2"	<water>	(IrrigationZonesFront,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/frontyard/2/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/2/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/2/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone3	"Front Zone 3"	<water>	(IrrigationZonesFront,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/frontyard/3/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/3/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/3/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone4	"Front Zone 4"	<water>	(IrrigationZonesFront,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/frontyard/4/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/4/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/4/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone5	"Front Zone 5"	<water>	(IrrigationZonesFront)	{ mqtt=">[broker:myHome/sprinkler/frontyard/5/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/5/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/5/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone6	"Front Zone 6"	<water>	(IrrigationZonesFront)	{ mqtt=">[broker:myHome/sprinkler/frontyard/6/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/6/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/6/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone7	"Front Zone 7"	<water>	(IrrigationZonesFront)	{ mqtt=">[broker:myHome/sprinkler/frontyard/7/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/7/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/7/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone8	"Front Zone 8"	<water>	(IrrigationZonesFront)	{ mqtt=">[broker:myHome/sprinkler/frontyard/8/target:command:ON:ON], >[broker:myHome/sprinkler/frontyard/8/target:command:OFF:OFF], <[broker:myHome/sprinkler/frontyard/8/status:state:default]", autoUpdate="false" }
+/*Irrigation Zones - Back Yard */
+Switch	BackyardZone1	"Back Zone 1"	<water>	(IrrigationZonesBack,ConnectedIrrigationZones)	{ mqtt="<[broker:myHome/sprinkler/backyard/1/status:state:default], >[broker:myHome/sprinkler/backyard/1/target:command:ON:ON],>[broker:myHome/sprinkler/backyard/1/target:command:OFF:OFF]", autoUpdate="false" }
+Switch	BackyardZone2	"Back Zone 2"	<water>	(IrrigationZonesBack,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/backyard/2/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/2/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/2/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone3	"Back Zone 3"	<water>	(IrrigationZonesBack,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/backyard/3/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/3/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/3/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone4	"Back Zone 4"	<water>	(IrrigationZonesBack,ConnectedIrrigationZones)	{ mqtt=">[broker:myHome/sprinkler/backyard/4/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/4/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/4/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone5	"Back Zone 5"	<water>	(IrrigationZonesBack)	{ mqtt=">[broker:myHome/sprinkler/backyard/5/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/5/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/5/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone6	"Back Zone 6"	<water>	(IrrigationZonesBack)	{ mqtt=">[broker:myHome/sprinkler/backyard/6/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/6/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/6/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone7	"Back Zone 7"	<water>	(IrrigationZonesBack)	{ mqtt=">[broker:myHome/sprinkler/backyard/7/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/7/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/7/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone8	"Back Zone 8"	<water>	(IrrigationZonesBack)	{ mqtt=">[broker:myHome/sprinkler/backyard/8/target:command:ON:ON], >[broker:myHome/sprinkler/backyard/8/target:command:OFF:OFF], <[broker:myHome/sprinkler/backyard/8/status:state:default]", autoUpdate="false" }
+/*Irrigation Zones - Status Only - Front Yard*/	
+Switch	FrontyardZone1Status	"Front Zone 1 Status"	<water>	(IrrigationStatusFront,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/frontyard/1/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone2Status	"Front Zone 2 Status"	<water>	(IrrigationStatusFront,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/frontyard/2/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone3Status	"Front Zone 3 Status"	<water>	(IrrigationStatusFront,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/frontyard/3/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone4Status	"Front Zone 4 Status"	<water>	(IrrigationStatusFront,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/frontyard/4/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone5Status	"Front Zone 5 Status"	<water>	(IrrigationStatusFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/5/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone6Status	"Front Zone 6 Status"	<water>	(IrrigationStatusFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/6/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone7Status	"Front Zone 7 Status"	<water>	(IrrigationStatusFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/7/status:state:default]", autoUpdate="false" }
+Switch	FrontyardZone8Status	"Front Zone 8 Status"	<water>	(IrrigationStatusFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/8/status:state:default]", autoUpdate="false" }
+/*Irrigation Zones - Status Only - Back Yard */
+Switch	BackyardZone1Status	"Back Zone 1 Status"	(IrrigationStatusBack,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/backyard/1/status:state:default]"}
+Switch	BackyardZone2Status	"Back Zone 2 Status"	(IrrigationStatusBack,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/backyard/2/status:state:default]"}
+Switch	BackyardZone3Status	"Back Zone 3 Status"	(IrrigationStatusBack,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/backyard/3/status:state:default]"}
+Switch	BackyardZone4Status	"Back Zone 4 Status"	(IrrigationStatusBack,ConnectedIrrigationZoneStatus)	{ mqtt="<[broker:myHome/sprinkler/backyard/4/status:state:default]"}
+Switch	BackyardZone5Status	"Back Zone 5 Status"	(IrrigationStatusBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/5/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone6Status	"Back Zone 6 Status"	(IrrigationStatusBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/6/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone7Status	"Back Zone 7 Status"	(IrrigationStatusBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/7/status:state:default]", autoUpdate="false" }
+Switch	BackyardZone8Status	"Back Zone 8 Status"	(IrrigationStatusBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/8/status:state:default]", autoUpdate="false" }
+
+/*Controller Settings - Front Yard */
+String	FrontyardIPaddress	"IP Address: [%s]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/IPaddress:state:default]" }
+String	FrontyardMACaddress	"MAC Address [%S]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/MACaddress:state:default]" }
+Number	FrontyardRSSI	"Signal Strength [%d dBm]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/RSSI:state:default]" }
+String	FrontyardMQTTname	"MQTT Client Name: [%s]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/clientName:state:default]" }
+String	FrontyardBrokerIP	"MQTT Broker IP address: [%s]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/brokerIP:state:default]" }
+Number	FrontyardStatusPeriod	"Status Reporting Period [%d]"	<water>	(ControllerSettingsFront)	{ mqtt=">[broker:myHome/sprinkler/frontyard/status/statusPeriod:command:*:default], <[broker:myHome/sprinkler/frontyard/status/statusPeriod:state:default]" }
+Number	FrontyardMaxOnTime	"Max On Time [%d]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/maxOnTime:state:default], >[broker:myHome/sprinkler/frontyard/status/maxOnTime:command:*:default]" }
+Number	FrontyardRunTime	"Frontyard Current Runtime [%.2f min]"	<water>	(ControllerSettingsFront)	{ mqtt="<[broker:myHome/sprinkler/frontyard/status/runtime:state:JS(msToMin.js)]" }
+/*Controller Settings - Back Yard */
+String	BackyardIPaddress	"IP Address: [%s]"	<water>	(ControllerSettingsBack)		{ mqtt="<[broker:myHome/sprinkler/backyard/status/IPaddress:state:default]" }
+String	BackyardMACaddress	"MAC Address [%S]"	<water>	(ControllerSettingsBack)        { mqtt="<[broker:myHome/sprinkler/backyard/status/MACaddress:state:default]" }
+Number	BackyardRSSI	"Signal Strength [%d dBm]"	<water>	(ControllerSettingsBack)		{ mqtt="<[broker:myHome/sprinkler/backyard/status/RSSI:state:default]" }
+String	BackyardMQTTname	"MQTT Client Name: [%s]"	<water>	(ControllerSettingsBack)		{ mqtt="<[broker:myHome/sprinkler/backyard/status/clientName:state:default]" }
+String	BackyardBrokerIP	"MQTT Broker IP address: [%s]"	<water>	(ControllerSettingsBack)		{ mqtt="<[broker:myHome/sprinkler/backyard/status/brokerIP:state:default]" }
+Number	BackyardStatusPeriod	"Status Reporting Period [%d]"	<water>	(ControllerSettingsBack)    { mqtt=">[broker:myHome/sprinkler/backyard/status/statusPeriod:command:*:default], <[broker:myHome/sprinkler/backyard/status/statusPeriod:state:default]" }
+Number	BackyardMaxOnTime	"Max On Time [%d]"	<water>	(ControllerSettingsBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/status/maxOnTime:state:default], >[broker:myHome/sprinkler/backyard/status/maxOnTime:command:*:default]" }
+Number	BackyardRunTime	"Backyard Current Runtime [%.2f min]"	<water>	(ControllerSettingsBack)	{ mqtt="<[broker:myHome/sprinkler/backyard/status/runtime:state:JS(msToMin.js)]" }

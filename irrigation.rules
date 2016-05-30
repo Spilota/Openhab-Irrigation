@@ -1,0 +1,676 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.joda.time.*
+
+import java.util.ArrayList
+
+rule "Disable irrigation if any rain"
+when
+   Item Precip_Total_Inches changed or
+   Item Condition changed or
+   Item Condition_2day changed
+then
+//    // the rainfall threshold where we shutdown off irrigation
+   var rainThreshold = 0.5
+
+   // check for any rain in the last 24 hours
+   var rainInLast24Hours = Precip_Total_Inches.maximumSince(now.minusHours(24))
+//
+//    // default to the current rain value in case there is nothing in our history
+   var rain = Precip_Total_Inches.state
+
+   if (rainInLast24Hours != null)
+       rain = rainInLast24Hours.state
+
+   // check if any rain is forecast
+   var rainToday = Condition.state == "chanceflurries" ||
+                   Condition.state == "chancerain" ||
+                   Condition.state == "chancesleet" ||
+                   Condition.state == "chancesnow" ||
+                   Condition.state == "chancetstorms" ||
+                   Condition.state == "flurries" ||                    
+                   Condition.state == "Rain" || 
+                   Condition.state == "sleet" ||
+                   Condition.state == "snow" ||
+                   Condition.state == "Thunderstorm"
+
+   var rainTomorrow = Condition_2day.state == "Chance of Flurries" ||
+                      Condition_2day.state == "Chance of Rain" ||
+					  Condition_2day.state == "Chance Rain" ||
+                      Condition_2day.state == "Chance of Sleet" ||
+                      Condition_2day.state == "Chance of Snow" ||
+                      Condition_2day.state == "Chance of Thunderstorms" ||
+                      Condition_2day.state == "Chance of a Thunderstorm" ||
+					  Condition_2day.state == "Flurries" ||
+                      Condition_2day.state == "Freezing Rain" ||
+					  Condition_2day.state == "Rain" || 
+                      Condition_2day.state == "Sleet" ||
+                      Condition_2day.state == "Snow" ||
+                      Condition_2day.state == "Thunderstorms" ||
+					  Condition_2day.state == "Thunderstorm"
+
+   // shutoff irrigation if there has been rain or rain is forecast
+   var logMessage = ""
+   if (rain > rainThreshold) {
+       logMessage = "Rain in the last 24 hours (" + rain + " in) is above our threshold (" + rainThreshold + " in) - irrigation disabled!"
+   } else if (rainToday) {
+       logMessage = "Rain is forecast for today - irrigation disabled!"
+   } else if (rainTomorrow) {
+       logMessage = "Rain is forecast for tomorrow - irrigation disabled!"
+   }
+
+   if (logMessage != "") {
+       if (ProgramA_Master.state == ON) {
+           logInfo("Irrigation", logMessage)
+		   sendTweet(logmessage)
+           postUpdate(ProgramA_Master, OFF)
+       }
+   } else {
+       if (ProgramA_Master.state == OFF) {
+           logInfo("Irrigation", "No rain in the last 24 hours or any rain forecast - irrigation enabled!")
+		   sendTweet("No rain in the last 24 hours or any rain forecast - irrigation enabled!")
+           postUpdate(ProgramA_Master, ON)
+       }
+   }
+end
+
+rule "ScheduleProgramA"
+when
+	Item ProgramA_Master received update or
+	Time cron "0 0 0 * * ?"
+    //Time cron "0 27 * * * ?"
+then
+	var ArrayList dayOfWeekSetting = newArrayList(
+		Monday_ProgramA.state, 
+		Tuesday_ProgramA.state, 
+		Wednesday_ProgramA.state, 
+		Thursday_ProgramA.state, 
+		Friday_ProgramA.state, 
+		Saturday_ProgramA.state, 
+		Sunday_ProgramA.state
+	)
+    if (dayOfWeekSetting.get(now.getDayOfWeek-1) == OFF){
+    	sendCommand(ProgramA_Master_DayofWeek, OFF)
+    	return false
+    }
+    if (ProgramA_Master.state == ON) {
+		logInfo("ScheduleProgramA", "Running Program A Scheduler")
+        // get the scale factor - used to reduce the run times across the board
+        var Number scaleFactor = ProgramA_ScaleFactor.state as DecimalType
+		logInfo("ScheduleProgramA", "Scale Factor:  " + scaleFactor)
+        //var Number scaleFactor = 100 as DecimalType
+
+        // convert our start time to a joda.time.DateTime for today
+		
+		var int minutes = (ProgramA_StartTime_Minutes.state as DecimalType).intValue()
+		var int hours = (ProgramA_StartTime_Hours.state as DecimalType).intValue()
+		var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+        //var DateTime startTime = now
+		logInfo("ScheduleProgramA", "Start Time:  " + startTime)
+        var DateTime endTime   
+        
+        sendTweet("The weather looks good and the sprinklers are set to run.  Scheduling program A to run at " + hours + ":" + minutes)     
+
+        // get the raw run times for each zone (in mins)
+        var Number frontZone1Mins = FrontyardZone1_Duration_A.state as DecimalType
+        var Number frontZone2Mins = FrontyardZone2_Duration_A.state as DecimalType
+        var Number frontZone3Mins = FrontyardZone3_Duration_A.state as DecimalType
+        var Number frontZone4Mins = FrontyardZone4_Duration_A.state as DecimalType
+		var Number backZone1Mins = BackyardZone1_Duration_A.state as DecimalType
+        var Number backZone2Mins = BackyardZone2_Duration_A.state as DecimalType
+        var Number backZone3Mins = BackyardZone3_Duration_A.state as DecimalType
+        var Number backZone4Mins = BackyardZone4_Duration_A.state as DecimalType
+        // convert to the actual run times (by applying the scale factor)
+        var int frontZone1Time = ((frontZone1Mins * scaleFactor) / 100).intValue
+        var int frontZone2Time = ((frontZone2Mins * scaleFactor) / 100).intValue
+        var int frontZone3Time = ((frontZone3Mins * scaleFactor) / 100).intValue
+        var int frontZone4Time = ((frontZone4Mins * scaleFactor) / 100).intValue
+        var int backZone1Time = ((backZone1Mins * scaleFactor) / 100).intValue
+        var int backZone2Time = ((backZone2Mins * scaleFactor) / 100).intValue
+        var int backZone3Time = ((backZone3Mins * scaleFactor) / 100).intValue
+        var int backZone4Time = ((backZone4Mins * scaleFactor) / 100).intValue
+
+        // turn on each zone in turn (with a minute gap between each zone activation)
+		if (startTime.isAfter(now)){
+			if (frontZone1Time > 0) {
+				endTime = startTime.plusMinutes(frontZone1Time)
+				logInfo("ScheduleProgramA", "Front Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Front Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone2Time > 0) {
+				endTime = startTime.plusMinutes(frontZone2Time)
+				logInfo("ScheduleProgramA", "Front Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Front Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone3Time > 0) {
+				endTime = startTime.plusMinutes(frontZone3Time)
+				logInfo("ScheduleProgramA", "Front Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Front Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone4Time > 0) {
+				endTime = startTime.plusMinutes(frontZone4Time)
+				logInfo("ScheduleProgramA", "Front Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Front Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone1Time > 0) {
+				endTime = startTime.plusMinutes(backZone1Time)
+				logInfo("ScheduleProgramA", "Back Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Back Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone2Time > 0) {
+				endTime = startTime.plusMinutes(backZone2Time)
+				logInfo("ScheduleProgramA", "Back Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Back Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone3Time > 0) {
+				endTime = startTime.plusMinutes(backZone3Time)
+				logInfo("ScheduleProgramA", "Back Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Back Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone4Time > 0) {
+				endTime = startTime.plusMinutes(backZone4Time)
+				logInfo("ScheduleProgramA", "Back Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramA", "Back Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+		}
+    } else {
+		logInfo("ScheduleProgramA", "Abort Program A, Master Switch disabled.")
+		sendTweet("Dreyfous Irrigation Program A is disabled, I won't be scheduling any watering today")
+	} 
+		
+end
+
+rule "ScheduleProgramB"
+when
+	Item ProgramB_Master received update or
+	Time cron "0 0 0 * * ?"
+    //Time cron "0 27 * * * ?"
+
+then
+	var ArrayList dayOfWeekSetting = newArrayList(
+		Monday_ProgramB.state, 
+		Tuesday_ProgramB.state, 
+		Wednesday_ProgramB.state, 
+		Thursday_ProgramB.state, 
+		Friday_ProgramB.state, 
+		Saturday_ProgramB.state, 
+		Sunday_ProgramB.state
+	)
+    if (dayOfWeekSetting.get(now.getDayOfWeek-1) == OFF){
+    	sendCommand(ProgramB_Master_DayofWeek, OFF)
+    	return false
+    }
+    
+    if (ProgramB_Master.state == ON) {
+		logInfo("ScheduleProgramB", "Running Program B Scheduler")
+        // get the scale factor - used to reduce the run times across the board
+        var Number scaleFactor = ProgramB_ScaleFactor.state as DecimalType
+		logInfo("ScheduleProgramB", "Scale Factor:  " + scaleFactor)
+        //var Number scaleFactor = 100 as DecimalType
+
+        // convert our start time to a joda.time.DateTime for today
+		
+		var int minutes = (ProgramB_StartTime_Minutes.state as DecimalType).intValue()
+		var int hours = (ProgramB_StartTime_Hours.state as DecimalType).intValue()
+		var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+        //var DateTime startTime = now
+		logInfo("ScheduleProgramB", "Start Time:  " + startTime)
+        var DateTime endTime        
+
+        // get the raw run times for each zone (in mins)
+        var Number frontZone1Mins = FrontyardZone1_Duration_B.state as DecimalType
+        var Number frontZone2Mins = FrontyardZone2_Duration_B.state as DecimalType
+        var Number frontZone3Mins = FrontyardZone3_Duration_B.state as DecimalType
+        var Number frontZone4Mins = FrontyardZone4_Duration_B.state as DecimalType
+		var Number backZone1Mins = BackyardZone1_Duration_B.state as DecimalType
+        var Number backZone2Mins = BackyardZone2_Duration_B.state as DecimalType
+        var Number backZone3Mins = BackyardZone3_Duration_B.state as DecimalType
+        var Number backZone4Mins = BackyardZone4_Duration_B.state as DecimalType
+        // convert to the actual run times (by applying the scale factor)
+        var int frontZone1Time = ((frontZone1Mins * scaleFactor) / 100).intValue
+        var int frontZone2Time = ((frontZone2Mins * scaleFactor) / 100).intValue
+        var int frontZone3Time = ((frontZone3Mins * scaleFactor) / 100).intValue
+        var int frontZone4Time = ((frontZone4Mins * scaleFactor) / 100).intValue
+        var int backZone1Time = ((backZone1Mins * scaleFactor) / 100).intValue
+        var int backZone2Time = ((backZone2Mins * scaleFactor) / 100).intValue
+        var int backZone3Time = ((backZone3Mins * scaleFactor) / 100).intValue
+        var int backZone4Time = ((backZone4Mins * scaleFactor) / 100).intValue
+
+        // turn on each zone in turn (with a minute gap between each zone activation)
+		if (startTime.isAfter(now)){
+			if (frontZone1Time > 0) {
+				endTime = startTime.plusMinutes(frontZone1Time)
+				logInfo("ScheduleProgramB", "Front Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Front Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone2Time > 0) {
+				endTime = startTime.plusMinutes(frontZone2Time)
+				logInfo("ScheduleProgramB", "Front Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Front Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone3Time > 0) {
+				endTime = startTime.plusMinutes(frontZone3Time)
+				logInfo("ScheduleProgramB", "Front Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Front Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone4Time > 0) {
+				endTime = startTime.plusMinutes(frontZone4Time)
+				logInfo("ScheduleProgramB", "Front Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Front Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone1Time > 0) {
+				endTime = startTime.plusMinutes(backZone1Time)
+				logInfo("ScheduleProgramB", "Back Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Back Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone2Time > 0) {
+				endTime = startTime.plusMinutes(backZone2Time)
+				logInfo("ScheduleProgramB", "Back Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Back Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone3Time > 0) {
+				endTime = startTime.plusMinutes(backZone3Time)
+				logInfo("ScheduleProgramB", "Back Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Back Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone4Time > 0) {
+				endTime = startTime.plusMinutes(backZone4Time)
+				logInfo("ScheduleProgramB", "Back Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramB", "Back Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+		}
+    }   
+end
+
+rule "ScheduleProgramC"
+when
+	Item ProgramC_Master received update or
+	Time cron "0 0 0 * * ?"
+    //Time cron "0 27 * * * ?"
+then
+	var ArrayList dayOfWeekSetting = newArrayList(
+		Monday_ProgramC.state, 
+		Tuesday_ProgramC.state, 
+		Wednesday_ProgramC.state, 
+		Thursday_ProgramC.state, 
+		Friday_ProgramC.state, 
+		Saturday_ProgramC.state, 
+		Sunday_ProgramC.state
+	)
+    if (dayOfWeekSetting.get(now.getDayOfWeek-1) == OFF){
+    	sendCommand(ProgramC_Master_DayofWeek, OFF)
+    	return false
+    }
+    if (ProgramC_Master.state == ON) {
+		logInfo("ScheduleProgramC", "Running Program C Scheduler")
+        // get the scale factor - used to reduce the run times across the board
+        var Number scaleFactor = ProgramC_ScaleFactor.state as DecimalType
+		logInfo("ScheduleProgramC", "Scale Factor:  " + scaleFactor)
+        //var Number scaleFactor = 100 as DecimalType
+
+        // convert our start time to a joda.time.DateTime for today
+		
+		var int minutes = (ProgramC_StartTime_Minutes.state as DecimalType).intValue()
+		var int hours = (ProgramC_StartTime_Hours.state as DecimalType).intValue()
+		var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+        //var DateTime startTime = now
+		logInfo("ScheduleProgramC", "Start Time:  " + startTime)
+        var DateTime endTime   
+        
+        sendTweet("The weather looks good and the sprinklers are set to run.  Scheduling program C to run at " + hours + ":" + minutes)     
+
+        // get the raw run times for each zone (in mins)
+        var Number frontZone1Mins = FrontyardZone1_Duration_C.state as DecimalType
+        var Number frontZone2Mins = FrontyardZone2_Duration_C.state as DecimalType
+        var Number frontZone3Mins = FrontyardZone3_Duration_C.state as DecimalType
+        var Number frontZone4Mins = FrontyardZone4_Duration_C.state as DecimalType
+		var Number backZone1Mins = BackyardZone1_Duration_C.state as DecimalType
+        var Number backZone2Mins = BackyardZone2_Duration_C.state as DecimalType
+        var Number backZone3Mins = BackyardZone3_Duration_C.state as DecimalType
+        var Number backZone4Mins = BackyardZone4_Duration_C.state as DecimalType
+        // convert to the actual run times (by applying the scale factor)
+        var int frontZone1Time = ((frontZone1Mins * scaleFactor) / 100).intValue
+        var int frontZone2Time = ((frontZone2Mins * scaleFactor) / 100).intValue
+        var int frontZone3Time = ((frontZone3Mins * scaleFactor) / 100).intValue
+        var int frontZone4Time = ((frontZone4Mins * scaleFactor) / 100).intValue
+        var int backZone1Time = ((backZone1Mins * scaleFactor) / 100).intValue
+        var int backZone2Time = ((backZone2Mins * scaleFactor) / 100).intValue
+        var int backZone3Time = ((backZone3Mins * scaleFactor) / 100).intValue
+        var int backZone4Time = ((backZone4Mins * scaleFactor) / 100).intValue
+
+        // turn on each zone in turn (with a minute gap between each zone activation)
+		if (startTime.isAfter(now)){
+			if (frontZone1Time > 0) {
+				endTime = startTime.plusMinutes(frontZone1Time)
+				logInfo("ScheduleProgramC", "Front Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Front Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone2Time > 0) {
+				endTime = startTime.plusMinutes(frontZone2Time)
+				logInfo("ScheduleProgramC", "Front Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Front Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone3Time > 0) {
+				endTime = startTime.plusMinutes(frontZone3Time)
+				logInfo("ScheduleProgramC", "Front Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Front Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone4Time > 0) {
+				endTime = startTime.plusMinutes(frontZone4Time)
+				logInfo("ScheduleProgramC", "Front Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Front Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone1Time > 0) {
+				endTime = startTime.plusMinutes(backZone1Time)
+				logInfo("ScheduleProgramC", "Back Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Back Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone2Time > 0) {
+				endTime = startTime.plusMinutes(backZone2Time)
+				logInfo("ScheduleProgramC", "Back Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Back Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone3Time > 0) {
+				endTime = startTime.plusMinutes(backZone3Time)
+				logInfo("ScheduleProgramC", "Back Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Back Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone4Time > 0) {
+				endTime = startTime.plusMinutes(backZone4Time)
+				logInfo("ScheduleProgramC", "Back Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramC", "Back Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+		}
+    } else {
+		logInfo("ScheduleProgramC", "Abort Program A, Master Switch disabled.")
+		sendTweet("Dreyfous Irrigation Program C is disabled, I won't be scheduling any watering today")
+	} 
+	
+end
+
+rule "ScheduleProgramD"
+when
+	Item ProgramD_Master received update or
+	Time cron "0 0 0 * * ?"
+    //Time cron "0 27 * * * ?"
+then
+	var ArrayList dayOfWeekSetting = newArrayList(
+		Monday_ProgramD.state, 
+		Tuesday_ProgramD.state, 
+		Wednesday_ProgramD.state, 
+		Thursday_ProgramD.state, 
+		Friday_ProgramD.state, 
+		Saturday_ProgramD.state, 
+		Sunday_ProgramD.state
+	)
+    if (dayOfWeekSetting.get(now.getDayOfWeek-1) == OFF){
+    	sendCommand(ProgramD_Master_DayofWeek, OFF)
+    	return false
+    }
+    if (ProgramD_Master.state == ON) {
+		logInfo("ScheduleProgramD", "Running Program D Scheduler")
+        // get the scale factor - used to reduce the run times across the board
+        var Number scaleFactor = ProgramD_ScaleFactor.state as DecimalType
+		logInfo("ScheduleProgramD", "Scale Factor:  " + scaleFactor)
+        //var Number scaleFactor = 100 as DecimalType
+
+        // convert our start time to a joda.time.DateTime for today
+		
+		var int minutes = (ProgramD_StartTime_Minutes.state as DecimalType).intValue()
+		var int hours = (ProgramD_StartTime_Hours.state as DecimalType).intValue()
+		var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+        //var DateTime startTime = now
+		logInfo("ScheduleProgramD", "Start Time:  " + startTime)
+        var DateTime endTime   
+        
+        sendTweet("The weather looks good and the sprinklers are set to run.  Scheduling program D to run at " + hours + ":" + minutes)     
+
+        // get the raw run times for each zone (in mins)
+        var Number frontZone1Mins = FrontyardZone1_Duration_D.state as DecimalType
+        var Number frontZone2Mins = FrontyardZone2_Duration_D.state as DecimalType
+        var Number frontZone3Mins = FrontyardZone3_Duration_D.state as DecimalType
+        var Number frontZone4Mins = FrontyardZone4_Duration_D.state as DecimalType
+		var Number backZone1Mins = BackyardZone1_Duration_D.state as DecimalType
+        var Number backZone2Mins = BackyardZone2_Duration_D.state as DecimalType
+        var Number backZone3Mins = BackyardZone3_Duration_D.state as DecimalType
+        var Number backZone4Mins = BackyardZone4_Duration_D.state as DecimalType
+        // convert to the actual run times (by applying the scale factor)
+        var int frontZone1Time = ((frontZone1Mins * scaleFactor) / 100).intValue
+        var int frontZone2Time = ((frontZone2Mins * scaleFactor) / 100).intValue
+        var int frontZone3Time = ((frontZone3Mins * scaleFactor) / 100).intValue
+        var int frontZone4Time = ((frontZone4Mins * scaleFactor) / 100).intValue
+        var int backZone1Time = ((backZone1Mins * scaleFactor) / 100).intValue
+        var int backZone2Time = ((backZone2Mins * scaleFactor) / 100).intValue
+        var int backZone3Time = ((backZone3Mins * scaleFactor) / 100).intValue
+        var int backZone4Time = ((backZone4Mins * scaleFactor) / 100).intValue
+
+        // turn on each zone in turn (with a minute gap between each zone activation)
+		if (startTime.isAfter(now)){
+			if (frontZone1Time > 0) {
+				endTime = startTime.plusMinutes(frontZone1Time)
+				logInfo("ScheduleProgramD", "Front Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Front Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone2Time > 0) {
+				endTime = startTime.plusMinutes(frontZone2Time)
+				logInfo("ScheduleProgramD", "Front Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Front Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone3Time > 0) {
+				endTime = startTime.plusMinutes(frontZone3Time)
+				logInfo("ScheduleProgramD", "Front Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Front Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (frontZone4Time > 0) {
+				endTime = startTime.plusMinutes(frontZone4Time)
+				logInfo("ScheduleProgramD", "Front Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Front Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(FrontyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(FrontyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone1Time > 0) {
+				endTime = startTime.plusMinutes(backZone1Time)
+				logInfo("ScheduleProgramD", "Back Zone 1 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Back Zone 1 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone1, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone1, OFF) ]
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone2Time > 0) {
+				endTime = startTime.plusMinutes(backZone2Time)
+				logInfo("ScheduleProgramD", "Back Zone 2 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Back Zone 2 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone2, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone2, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone3Time > 0) {
+				endTime = startTime.plusMinutes(backZone3Time)
+				logInfo("ScheduleProgramD", "Back Zone 3 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Back Zone 3 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone3, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone3, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+			if (backZone4Time > 0) {
+				endTime = startTime.plusMinutes(backZone4Time)
+				logInfo("ScheduleProgramD", "Back Zone 4 Start Time:  " + startTime)
+				logInfo("ScheduleProgramD", "Back Zone 4 End Time:  " + endTime)
+				createTimer(startTime) [| sendCommand(BackyardZone4, ON) ]
+				createTimer(endTime) [| sendCommand(BackyardZone4, OFF) ]         
+				startTime = endTime.plusMinutes(1)
+			}
+		}
+    } else {
+		logInfo("ScheduleProgramD", "Abort Program A, Master Switch disabled.")
+		sendTweet("Dreyfous Irrigation Program D is disabled, I won't be scheduling any watering today")
+	} 
+		
+end
+
+rule "Set Program A Startime"
+when
+    Item ProgramA_StartTime_Minutes received update or
+    Item ProgramA_StartTime_Hours received update
+then
+	if (ProgramA_StartTime_Minutes.state == 60){
+		ProgramA_StartTime_Minutes.sendCommand(0)
+	}
+	if (ProgramA_StartTime_Hours.state == 24){
+		ProgramA_StartTime_Hours.sendCommand(0)
+	}
+    var int minutes = (ProgramA_StartTime_Minutes.state as DecimalType).intValue()
+    var int hours = (ProgramA_StartTime_Hours.state as DecimalType).intValue()
+
+   	// work out when the program is to start
+	var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+
+    // update the alarm display time    
+    ProgramA_StartTime.sendCommand(String::format("%02d:%02d", startTime.getHourOfDay(), startTime.getMinuteOfHour()))
+end
+
+rule "Set Program B Startime"
+when
+    Item ProgramB_StartTime_Minutes received update or
+    Item ProgramB_StartTime_Hours received update
+then
+	if (ProgramB_StartTime_Minutes.state == 60){
+		ProgramB_StartTime_Minutes.sendCommand(0)
+	}
+	if (ProgramB_StartTime_Hours.state == 24){
+		ProgramB_StartTime_Hours.sendCommand(0)
+	}
+    var int minutes = (ProgramB_StartTime_Minutes.state as DecimalType).intValue()
+    var int hours = (ProgramB_StartTime_Hours.state as DecimalType).intValue()
+
+   	// work out when the program is to start
+	var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+
+    // update the alarm display time    
+    ProgramB_StartTime.sendCommand(String::format("%02d:%02d", startTime.getHourOfDay(), startTime.getMinuteOfHour()))
+end
+
+rule "Set Program C Startime"
+when
+    Item ProgramC_StartTime_Minutes received update or
+    Item ProgramC_StartTime_Hours received update
+then
+	if (ProgramC_StartTime_Minutes.state == 60){
+		ProgramC_StartTime_Minutes.sendCommand(0)
+	}
+	if (ProgramC_StartTime_Hours.state == 24){
+		ProgramC_StartTime_Hours.sendCommand(0)
+	}
+    var int minutes = (ProgramC_StartTime_Minutes.state as DecimalType).intValue()
+    var int hours = (ProgramC_StartTime_Hours.state as DecimalType).intValue()
+
+   	// work out when the program is to start
+	var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+
+    // update the alarm display time    
+    ProgramC_StartTime.sendCommand(String::format("%02d:%02d", startTime.getHourOfDay(), startTime.getMinuteOfHour()))
+end	
+
+rule "Set Program D Startime"
+when
+    Item ProgramD_StartTime_Minutes received update or
+    Item ProgramD_StartTime_Hours received update
+then
+	if (ProgramD_StartTime_Minutes.state == 60){
+		ProgramD_StartTime_Minutes.sendCommand(0)
+	}
+	if (ProgramD_StartTime_Hours.state == 24){
+		ProgramD_StartTime_Hours.sendCommand(0)
+	}
+    var int minutes = (ProgramD_StartTime_Minutes.state as DecimalType).intValue()
+    var int hours = (ProgramD_StartTime_Hours.state as DecimalType).intValue()
+
+   	// work out when the program is to start
+	var DateTime startTime = parse(now.getYear() + "-" + now.getMonthOfYear() + "-" + now.getDayOfMonth() + "T" + hours + ":" + minutes)
+
+    // update the alarm display time    
+    ProgramD_StartTime.sendCommand(String::format("%02d:%02d", startTime.getHourOfDay(), startTime.getMinuteOfHour()))
+end	
